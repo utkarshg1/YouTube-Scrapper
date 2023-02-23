@@ -90,9 +90,7 @@ def selenium_method(url):
 
     # Creating A final Dictionary
     dct_final = {'title':top5titles,'views':views_exact,'uploadDate':dates,'videoURL':video_urls,'thumbnails':top5thumbnails}
-    logging.info("Logging dict ---> {0}".format(dct_final))
-
-    # Saving to pymongo
+    #logging.info("Logging dict ---> {0}".format(dct_final))    
 
     # Creating a DataFrame
     df_final = pd.DataFrame(dct_final)
@@ -103,10 +101,15 @@ def selenium_method(url):
     # Saving DataFrame
     df_final.to_csv('YTdata.csv',index=False)
 
+    # Saving to pymongo
+    client = pymongo.MongoClient("mongodb+srv://gaikwadujg:xsljXpgLNpzaz4Te@cluster0.7chcxpg.mongodb.net/?retryWrites=true&w=majority")
+    db = client['yt_scrapper_db']
+    collection = db['yt_data']
+    collection.insert_one(dct_final)
+
     logging.info('Data downloaded to YTdata.csv')
 
     return df_final
 
 if __name__ == '__main__':
-    app.run(host = '0.0.0.0', port=8000, debug=True)
-    
+    app.run(host = '127.0.0.1', port=8000, debug=True)    
