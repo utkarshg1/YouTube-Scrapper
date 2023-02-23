@@ -7,12 +7,14 @@ import pandas as pd
 from flask import Flask, render_template, request,jsonify
 from flask_cors import CORS,cross_origin
 import logging
-
+import sys
+import pymongo
 
 app = Flask(__name__)
 
 import logging
 logging.basicConfig(filename='YTWebScrapper.log',level=logging.DEBUG,format= '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 @app.route('/',methods=['GET'])  # route to display the home page
 @cross_origin()
@@ -88,7 +90,9 @@ def selenium_method(url):
 
     # Creating A final Dictionary
     dct_final = {'title':top5titles,'views':views_exact,'uploadDate':dates,'videoURL':video_urls,'thumbnails':top5thumbnails}
-    logging.info('"Loging dict ---> {0}".format(dct_final)')
+    logging.info("Logging dict ---> {0}".format(dct_final))
+
+    # Saving to pymongo
 
     # Creating a DataFrame
     df_final = pd.DataFrame(dct_final)
@@ -97,11 +101,12 @@ def selenium_method(url):
     driver.quit()
 
     # Saving DataFrame
-    df_final.to_csv('YTdata.csv')
+    df_final.to_csv('YTdata.csv',index=False)
 
     logging.info('Data downloaded to YTdata.csv')
 
     return df_final
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=8000, debug=True)
+    app.run(host = '0.0.0.0', port=8000, debug=True)
+    
